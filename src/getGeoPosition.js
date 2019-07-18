@@ -1,4 +1,4 @@
-export default function getCurrentPosition() {
+export default function getGeoPosition() {
   const options = {
     maximumAge: 1800000,
   };

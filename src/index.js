@@ -1,8 +1,17 @@
-import './styles.css';
-import getCurrentPosition from './getGeoPosition';
+import PNotify from 'pnotify/dist/es/PNotify.js';
+import PNotifyButtons from 'pnotify/dist/es/PNotifyButtons.js';
+import PNotifyStyleMaterial from 'pnotify/dist/es/PNotifyStyleMaterial.js';
+import getGeoPosition from './getGeoPosition';
 import fetchWeather from './fetchWeather';
+import 'pnotify/dist/PNotifyBrightTheme.css';
+import 'material-design-icons/iconfont/material-icons.css';
+import './styles.css';
+
+PNotify.defaults.styling = 'material';
+PNotify.defaults.icons = 'material';
 
 const refs = {
+  weatherSection: document.querySelector('#weather'),
   icon: document.querySelector('.icon'),
   location: document.querySelector('span[data-field="location"]'),
   temperature: document.querySelector('span[data-field="temp"]'),
@@ -12,27 +21,47 @@ const refs = {
   searchForm: document.querySelector('#search-form'),
 };
 
+getGeoPosition()
+  .then(location => {
+    const latitude = location.coords.latitude;
+    const longitude = location.coords.longitude;
+    const query = `${latitude},${longitude}`;
+
+    if (query) {
+      PNotify.success({
+        text: 'Показана погода в вашем регионе.',
+      });
+      fetchWeather(query)
+        .then(response => response.json())
+        .then(weather => {
+          refs.weatherSection.classList.remove('is-hidden');
+          displayWeather(weather);
+        });
+    }
+  })
+  .catch(error => {
+    PNotify.error({
+      text: 'Нет прав доступа к геопозиции, используйте поиск по имени города.',
+    });
+  });
+
 refs.searchForm.addEventListener('submit', searchFormHandler);
 
 function searchFormHandler(e) {
   e.preventDefault();
   const city = e.currentTarget.elements.city.value;
+  fetchWeather(city)
+    .then(response => response.json())
+    .then(weather => {
+      refs.weatherSection.classList.remove('is-hidden');
+      displayWeather(weather);
+    })
+    .catch(error => {
+      PNotify.error({
+        text: 'Города с таким названием не найдено.',
+      });
+    });
 }
-
-getCurrentPosition()
-  .then(location => {
-    console.log(location);
-  })
-  .catch(error => {
-    console.log(error);
-  });
-
-fetchWeather('винница')
-  .then(response => response.json())
-  .then(weather => {
-    displayWeather(weather);
-    console.log(weather);
-  });
 
 function displayWeather(weather) {
   refs.icon.src = 'http:' + weather.current.condition.icon;
