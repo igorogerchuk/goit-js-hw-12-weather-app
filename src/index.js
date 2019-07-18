@@ -64,7 +64,7 @@ function searchFormHandler(e) {
 }
 
 function displayWeather(weather) {
-  refs.icon.src = 'http:' + weather.current.condition.icon;
+  refs.icon.src = 'https:' + weather.current.condition.icon;
   refs.location.textContent = weather.location.name;
   refs.temperature.textContent = weather.current.temp_c + '\u2103';
   refs.humidity.textContent = weather.current.humidity + '%';
