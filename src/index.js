@@ -9,7 +9,15 @@ const refs = {
   humidity: document.querySelector('span[data-field="humidity"]'),
   wind: document.querySelector('span[data-field="wind"]'),
   conditions: document.querySelector('span[data-field="conditions"]'),
+  searchForm: document.querySelector('#search-form'),
 };
+
+refs.searchForm.addEventListener('submit', searchFormHandler);
+
+function searchFormHandler(e) {
+  e.preventDefault();
+  const city = e.currentTarget.elements.city.value;
+}
 
 getCurrentPosition()
   .then(location => {
